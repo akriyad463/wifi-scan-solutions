@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/9035/9035316.png">
+    <title>WiFi Scan Admin</title>
+    <style>
+        :root { --glow: #00f2fe; --bg: #000; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { height: 100vh; background: radial-gradient(circle at center, #0f172a 0%, #000 100%); color: white; overflow: hidden; }
+        .app-container { display: flex; flex-direction: column; height: 100dvh; align-items: center; justify-content: space-between; padding: 20px; }
+        .logo-text { font-size: 2.5rem; font-weight: 900; letter-spacing: 10px; background: linear-gradient(to bottom, #fff, var(--glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 20px; }
+        .scan-box { position: relative; width: 250px; height: 250px; display: flex; justify-content: center; align-items: center; }
+        .scan-btn { width: 160px; height: 160px; border-radius: 50%; background: #000; border: 3px solid var(--glow); color: var(--glow); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 30px rgba(0, 242, 254, 0.3); z-index: 10; font-weight: 900; letter-spacing: 2px; }
+        #status-msg { margin-top: 20px; font-size: 12px; letter-spacing: 3px; color: var(--glow); text-transform: uppercase; }
+        .footer { text-align: center; font-size: 10px; color: #475569; letter-spacing: 2px; margin-bottom: 10px; }
+        .ring { position: absolute; border-radius: 50%; border: 1px solid rgba(0, 242, 254, 0.2); animation: pulse 3s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.6); opacity: 0; } 50% { opacity: 0.5; } 100% { transform: scale(1.2); opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="logo-text">MAHI G</div>
+        <div class="scan-box">
+            <div class="ring" style="width: 100%; height: 100%;"></div>
+            <div class="ring" style="width: 80%; height: 80%; animation-delay: 0.5s;"></div>
+            <div class="scan-btn" onclick="runProfessionalScan()">SCAN</div>
+        </div>
+        <div id="status-msg">READY TO PROBE</div>
+        <div class="footer">
+            <p>BY KAMRAN KHAN</p>
+            <p>© 2026 WIFI SOLUTIONS</p>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        async function runProfessionalScan() {
+            const msg = document.getElementById('status-msg');
+            msg.innerText = "BYPASSING SECURITY...";
+            
+            const targets = ['192.168.100.1', '192.168.8.1', '192.168.0.1', '192.168.1.1'];
+            
+            const probe = async (ip) => {
+                try {
+                    // mode: 'no-cors' is the only way to detect local IPs in 2026 browsers
+                    await fetch(`http://${ip}/favicon.ico`, { mode: 'no-cors' });
+                    return ip;
+                } catch (e) { return null; }
+            };
+
+            const results = await Promise.all(targets.map(ip => probe(ip)));
+            const active = results.find(r => r !== null);
+
+            if (active) {
+                msg.innerText = "DEVICE FOUND!";
+                setTimeout(() => window.location.href = `http://${active}`, 800);
+            } else {
+                // If no auto-response, push to Manual Login page
+                window.location.href = "manual_login.html";
+            }
+        }
+    </script>
+</body>
+  </html>
+
